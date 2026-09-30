@@ -1,6 +1,7 @@
 package svenmeier.coxswain;
 
 import android.app.Application;
+import androidx.multidex.MultiDexApplication;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -15,7 +16,7 @@ import java.io.File;
 
 /**
  */
-public class Coxswain extends Application {
+public class Coxswain extends MultiDexApplication {
 
 	public static String TAG = "coxswain";
 

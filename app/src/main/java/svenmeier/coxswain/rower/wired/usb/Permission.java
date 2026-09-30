@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 
+import androidx.core.content.ContextCompat;
+
 /**
  * Request permission to use a {@link UsbDevice}.
  * <p>
@@ -26,7 +28,7 @@ public class Permission extends BroadcastReceiver {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(ACTION_USB_PERMISSION);
 		filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-		context.registerReceiver(this, filter);
+		ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
 	}
 
 	public void destroy() {
@@ -37,7 +39,7 @@ public class Permission extends BroadcastReceiver {
 	public void request(UsbDevice device) {
 		UsbManager manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
 
-		manager.requestPermission(device, PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0));
+		manager.requestPermission(device, PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE));
 	}
 
 	public void onReceive(Context context, Intent intent) {

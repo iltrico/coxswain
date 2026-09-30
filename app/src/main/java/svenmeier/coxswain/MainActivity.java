@@ -15,10 +15,13 @@
  */
 package svenmeier.coxswain;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +31,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -48,6 +52,7 @@ public class MainActivity extends AbstractActivity {
     public static String TAG = "coxswain";
 
     private static final int REQUEST_IMPORT = 42;
+    private static final int REQUEST_BLUETOOTH = 43;
 
     private Gym gym;
 
@@ -155,6 +160,7 @@ public class MainActivity extends AbstractActivity {
     private boolean checkUsbDevice(Intent intent) {
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(intent.getAction())) {
             UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+            android.util.Log.i(Coxswain.TAG, "DEBUG checkUsbDevice device=" + device);
             if (device != null) {
                 GymService.start(this, device);
 
@@ -189,6 +195,18 @@ public class MainActivity extends AbstractActivity {
 
         // consume intent
         intent.setAction(null);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_BLUETOOTH) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                GymService.start(this, GymService.CONNECTOR_BLUETOOTH);
+            } else {
+                Toast.makeText(this, R.string.bluetooth_permission_required, Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
@@ -232,8 +250,14 @@ public class MainActivity extends AbstractActivity {
 
             return true;
         } else if (id == R.id.action_bluetooth) {
-            GymService.start(this, GymService.CONNECTOR_BLUETOOTH);
-
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT},
+                        REQUEST_BLUETOOTH);
+            } else {
+                GymService.start(this, GymService.CONNECTOR_BLUETOOTH);
+            }
             return true;
         } else if (id == R.id.action_import) {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);

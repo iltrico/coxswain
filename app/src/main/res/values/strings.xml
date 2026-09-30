@@ -157,6 +157,7 @@
     <string name="bluetooth_heart_disconnected">Bluetooth heart connection lost to %s</string>
     <string name="bluetooth_heart_battery_level">Bluetooth heart battery level &lt; %d%%</string>
 
+    <string name="bluetooth_permission_required">Bluetooth permission is required to connect to a device</string>
     <string name="bluetooth_choose">Choose %s</string>
     <string name="bluetooth_choose_filtered">%s only</string>
     <string name="bluetooth_choose_remember">remember selection</string>

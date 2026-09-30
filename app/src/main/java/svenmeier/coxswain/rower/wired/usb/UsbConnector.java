@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 
+import androidx.core.content.ContextCompat;
+
 import java.util.Collection;
 
 /**
@@ -26,7 +28,7 @@ public class UsbConnector extends BroadcastReceiver {
 
 		manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
 
-		context.registerReceiver(this, new IntentFilter(DEVICE_CONNECT));
+		ContextCompat.registerReceiver(context, this, new IntentFilter(DEVICE_CONNECT), ContextCompat.RECEIVER_NOT_EXPORTED);
 	}
 
 	public void destroy() {
@@ -44,7 +46,7 @@ public class UsbConnector extends BroadcastReceiver {
 	 */
 	public void connect(UsbDevice device) {
 
-		PendingIntent intent = PendingIntent.getBroadcast(context, 0, new Intent(DEVICE_CONNECT), 0);
+		PendingIntent intent = PendingIntent.getBroadcast(context, 0, new Intent(DEVICE_CONNECT), PendingIntent.FLAG_IMMUTABLE);
 
 		manager.requestPermission(device, intent);
 		

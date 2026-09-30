@@ -23,6 +23,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -289,7 +290,7 @@ public class BluetoothActivity extends AppCompatActivity implements CompoundButt
 			filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 			filter.addAction(LocationManager.MODE_CHANGED_ACTION);
 			filter.addAction(ACTION_CANCEL);
-			registerReceiver(this, filter);
+			ContextCompat.registerReceiver(BluetoothActivity.this, this, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
 		}
 
 		@Override

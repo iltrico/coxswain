@@ -21,6 +21,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.hardware.usb.UsbDevice;
 import android.os.Build;
 import android.os.Handler;
@@ -222,10 +223,15 @@ public class GymService extends Service implements Gym.Listener, Rower.Callback,
             Coxswain.initNotification(GymService.this, builder, "Gym");
 
             PendingIntent intent = PendingIntent.getService(getApplicationContext(), 0,
-                    createIntent(getApplicationContext(), CONNECTOR_NONE), PendingIntent.FLAG_UPDATE_CURRENT);
+                    createIntent(getApplicationContext(), CONNECTOR_NONE), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             builder.addAction(0, getString(R.string.gym_notification_disconnect),intent);
 
-            startForeground(NOTIFICATION_ID, builder.build());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(NOTIFICATION_ID, builder.build(),
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE);
+            } else {
+                startForeground(NOTIFICATION_ID, builder.build());
+            }
         }
 
         public void connected() {
@@ -237,7 +243,7 @@ public class GymService extends Service implements Gym.Listener, Rower.Callback,
                 return;
             }
 
-            builder.setContentIntent(PendingIntent.getActivity(service, 1, new Intent(service, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT));
+            builder.setContentIntent(PendingIntent.getActivity(service, 1, new Intent(service, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
             builder.setContentText(text);
             builder.setProgress(0, 0, false);
             builder.setOnlyAlertOnce(true);
@@ -264,7 +270,7 @@ public class GymService extends Service implements Gym.Listener, Rower.Callback,
                 return;
             }
 
-            builder.setContentIntent(PendingIntent.getActivity(service, 1, new Intent(service, WorkoutActivity.class), PendingIntent.FLAG_UPDATE_CURRENT));
+            builder.setContentIntent(PendingIntent.getActivity(service, 1, new Intent(service, WorkoutActivity.class), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
             builder.setContentText(text);
             builder.setProgress(100, progress, false);
             builder.setOnlyAlertOnce(text.equals(this.text));
