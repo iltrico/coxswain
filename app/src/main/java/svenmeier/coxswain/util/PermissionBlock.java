@@ -52,7 +52,7 @@ public class PermissionBlock {
 		IntentFilter filter = PermissionActivity.start(context, permissions);
 
 		receiver = new BroadcastReceiverImpl();
-		context.registerReceiver(receiver, filter);
+		ContextCompat.registerReceiver(context, receiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
 	}
 
 	private void unregister() {

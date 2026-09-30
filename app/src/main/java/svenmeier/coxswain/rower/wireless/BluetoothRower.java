@@ -25,6 +25,8 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.UUID;
 
+import androidx.core.content.ContextCompat;
+
 import propoid.util.content.Preference;
 import svenmeier.coxswain.Coxswain;
 import svenmeier.coxswain.R;
@@ -166,7 +168,7 @@ public class BluetoothRower extends Rower {
 
 					IntentFilter filter = new IntentFilter();
 					filter.addAction(LocationManager.MODE_CHANGED_ACTION);
-					context.registerReceiver(this, filter);
+					ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
 					registered = true;
 
 					return;
@@ -241,7 +243,7 @@ public class BluetoothRower extends Rower {
 			IntentFilter filter = new IntentFilter();
 			filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 			filter.addAction(LocationManager.MODE_CHANGED_ACTION);
-			context.registerReceiver(this, filter);
+			ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
 			registered = true;
 
 			if (adapter.isEnabled() == false) {
@@ -292,7 +294,7 @@ public class BluetoothRower extends Rower {
 
 			String name = context.getString(R.string.bluetooth_rower);
 			IntentFilter filter = BluetoothActivity.start(context, name, BlueWriter.SERVICE_FITNESS_MACHINE.toString());
-			context.registerReceiver(this, filter);
+			ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
 			registered = true;
 		}
 

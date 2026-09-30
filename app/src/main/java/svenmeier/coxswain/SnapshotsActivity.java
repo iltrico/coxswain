@@ -19,11 +19,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateUtils;
+import android.util.TypedValue;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -93,7 +93,9 @@ public class SnapshotsActivity extends AbstractActivity implements CompoundButto
         chartView = findViewById(R.id.chart);
         chartView.setScaleYEnabled(false);
         chartView.getDescription().setEnabled(false);
-        chartView.getLegend().setTextColor(ContextCompat.getColor(this, R.color.design_default_color_primary));
+        TypedValue legendColorValue = new TypedValue();
+        getTheme().resolveAttribute(android.R.attr.textColorPrimary, legendColorValue, true);
+        chartView.getLegend().setTextColor(legendColorValue.data);
         chartView.getLegend().setTextSize(LEGEND_TEXT_SIZE);
         chartView.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
         chartView.getLegend().setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);

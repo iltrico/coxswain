@@ -19,6 +19,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+
+import androidx.core.content.ContextCompat;
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
@@ -103,7 +105,7 @@ public class UsbRower extends Rower implements Runnable {
                 }
             }
         };
-        context.registerReceiver(receiver, new IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED));
+        ContextCompat.registerReceiver(context, receiver, new IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED), ContextCompat.RECEIVER_NOT_EXPORTED);
 
         if (Preference.getBoolean(context, R.string.preference_hardware_legacy).get()) {
             protocol = new Protocol3(transfer, trace);
@@ -151,13 +153,16 @@ public class UsbRower extends Rower implements Runnable {
 
     private boolean initConnection() {
         trace.comment(String.format("connecting to %s", device.getDeviceName()));
+        Log.i(Coxswain.TAG, "DEBUG initConnection device=" + device.getDeviceName() + " vendor=" + device.getVendorId() + " product=" + device.getProductId() + " interfaces=" + device.getInterfaceCount());
 
         UsbManager manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
         this.connection = manager.openDevice(device);
         if (this.connection == null) {
             trace.comment(String.format("cannot open connection %s", device.getDeviceName()));
+            Log.i(Coxswain.TAG, "DEBUG openDevice returned null");
             return false;
         }
+        Log.i(Coxswain.TAG, "DEBUG openDevice succeeded");
 
         for (int i = 0; i < device.getInterfaceCount(); i++) {
             UsbInterface anInterface = device.getInterface(i);
@@ -181,17 +186,21 @@ public class UsbRower extends Rower implements Runnable {
             if (out != null && in != null) {
                 if (this.connection.claimInterface(anInterface, true)) {
                     trace.comment(String.format("claimed interface %s", interfaceId));
+                    Log.i(Coxswain.TAG, "DEBUG claimed interface " + interfaceId);
                     transfer = new UsbTransfer(connection, in, out);
                     return true;
                 } else {
                     trace.comment(String.format("cannot claim interface %s", interfaceId));
+                    Log.i(Coxswain.TAG, "DEBUG cannot claim interface " + interfaceId);
                 }
             } else {
                 trace.comment(String.format("no bulk endpoints %s", interfaceId));
+                Log.i(Coxswain.TAG, "DEBUG no bulk endpoints on interface " + interfaceId);
             }
         }
 
         trace.comment("no interface");
+        Log.i(Coxswain.TAG, "DEBUG no usable interface found");
         this.connection.close();
         this.connection = null;
         return false;
